@@ -4,7 +4,7 @@
 [![pub package](https://img.shields.io/pub/v/philiprehberger_event_bus.svg)](https://pub.dev/packages/philiprehberger_event_bus)
 [![Last updated](https://img.shields.io/github/last-commit/philiprehberger/dart-event-bus)](https://github.com/philiprehberger/dart-event-bus/commits/main)
 
-Typed event bus with Stream subscriptions, sticky events, and scoped lifecycle
+Typed event bus with Stream subscriptions, sticky events, event history, and scoped lifecycle
 
 ## Requirements
 
@@ -16,7 +16,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  philiprehberger_event_bus: ^0.1.0
+  philiprehberger_event_bus: ^0.2.0
 ```
 
 Then run:
@@ -77,6 +77,49 @@ final last = bus.lastSticky<UserLoggedIn>();
 bus.clearSticky<UserLoggedIn>();
 ```
 
+### One-Time Listener
+
+Listen for a single event and automatically unsubscribe:
+
+```dart
+final event = await bus.once<UserLoggedIn>();
+print('Got one: ${event.userId}');
+```
+
+### Event History
+
+Store past events and replay them to new subscribers:
+
+```dart
+bus.enableHistory<String>(maxSize: 50);
+
+bus.fire('first');
+bus.fire('second');
+
+// Retrieve stored events
+print(bus.history<String>()); // ['first', 'second']
+
+// New subscriber receives history then live events
+bus.onWithHistory<String>().listen((event) {
+  print(event); // 'first', 'second', then any new events
+});
+```
+
+### Listener Introspection
+
+Check whether the bus has active listeners:
+
+```dart
+print(bus.hasListeners); // false
+
+final sub = bus.on<String>().listen((_) {});
+print(bus.hasListeners);  // true
+print(bus.listenerCount); // 1
+
+sub.cancel();
+print(bus.listenerCount); // 0
+```
+
 ### Dispose
 
 ```dart
@@ -91,9 +134,15 @@ After calling `dispose()`, no more events can be fired or received.
 |--------|-------------|
 | `fire<T>(T event)` | Dispatch an event to all listeners of type `T` |
 | `on<T>()` | Subscribe to events of type `T`, returns `Stream<T>` |
+| `once<T>()` | Returns a `Future<T>` that completes with the next event, then auto-cancels |
 | `fireSticky<T>(T event)` | Dispatch a sticky event that replays to new subscribers |
 | `lastSticky<T>()` | Get the last sticky event of type `T`, or `null` |
 | `clearSticky<T>()` | Remove the stored sticky event of type `T` |
+| `enableHistory<T>({int maxSize})` | Enable event history for type `T` with a max capacity |
+| `history<T>()` | Get stored events of type `T` as an unmodifiable list |
+| `onWithHistory<T>()` | Stream that emits stored history first, then live events |
+| `hasListeners` | Whether any listeners are currently active |
+| `listenerCount` | Number of active stream subscriptions |
 | `dispose()` | Close the bus and release all resources |
 
 ## Development

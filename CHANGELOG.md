@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-04
+
+### Added
+- `once<T>()` for one-time event listening that auto-cancels after first event
+- Event history with `enableHistory<T>()`, `history<T>()`, and `onWithHistory<T>()`
+- `hasListeners` getter to check if any listeners are active
+- `listenerCount` getter to track the number of active stream subscriptions
+
 ## [0.1.0] - 2026-04-03
 
 ### Added
