@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-05
+
+### Added
+- `onAny()` method for wildcard listening — returns a `Stream<dynamic>` that fires for every event type, useful for logging and debugging
+
 ## [0.2.0] - 2026-04-04
 
 ### Added

@@ -99,6 +99,18 @@ class EventBus {
   /// The number of active stream subscriptions created via [on] or [onWithHistory].
   int get listenerCount => _listenerCount;
 
+  /// Listen to all events regardless of type.
+  ///
+  /// Returns a broadcast stream that fires for every event dispatched
+  /// through this bus. Useful for logging and debugging.
+  Stream<dynamic> onAny() {
+    return _CountedStream<dynamic>(
+      _controller.stream,
+      onListen: () => _listenerCount++,
+      onCancel: () => _listenerCount--,
+    );
+  }
+
   /// Listen to events of type [T].
   ///
   /// If a sticky event of type [T] exists, it is emitted immediately
