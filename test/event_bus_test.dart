@@ -124,6 +124,31 @@ void main() {
       await sub.cancel();
       bus.dispose();
     });
+
+    test('clearHistory empties stored events but keeps collection active', () {
+      final bus = EventBus();
+      bus.enableHistory<String>(maxSize: 10);
+      bus.fire('a');
+      bus.fire('b');
+      bus.clearHistory<String>();
+      expect(bus.history<String>(), isEmpty);
+
+      bus.fire('c');
+      expect(bus.history<String>(), equals(['c']));
+      bus.dispose();
+    });
+
+    test('disableHistory stops collection and removes stored events', () {
+      final bus = EventBus();
+      bus.enableHistory<String>(maxSize: 10);
+      bus.fire('a');
+      bus.disableHistory<String>();
+      expect(bus.history<String>(), isEmpty);
+
+      bus.fire('b');
+      expect(bus.history<String>(), isEmpty);
+      bus.dispose();
+    });
   });
 
   group('onAny', () {
