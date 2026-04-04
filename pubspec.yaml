@@ -1,0 +1,14 @@
+name: philiprehberger_event_bus
+description: >-
+  Typed event bus with Stream subscriptions, sticky events, and scoped lifecycle
+version: 0.1.0
+homepage: https://philiprehberger.com/open-source-packages/dart/philiprehberger_event_bus
+repository: https://github.com/philiprehberger/dart-event-bus
+issue_tracker: https://github.com/philiprehberger/dart-event-bus/issues
+
+environment:
+  sdk: ^3.6.0
+
+dev_dependencies:
+  test: ^1.25.0
+  lints: ^5.0.0
