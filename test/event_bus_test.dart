@@ -60,4 +60,113 @@ void main() {
       expect(() => bus.fire('after-dispose'), throwsStateError);
     });
   });
+
+  group('once', () {
+    test('resolves with first matching event', () async {
+      final bus = EventBus();
+      final future = bus.once<String>();
+      bus.fire('hello');
+      expect(await future, equals('hello'));
+      bus.dispose();
+    });
+
+    test('does not receive subsequent events', () async {
+      final bus = EventBus();
+      final future = bus.once<String>();
+      bus.fire('first');
+      bus.fire('second');
+      expect(await future, equals('first'));
+      bus.dispose();
+    });
+  });
+
+  group('history', () {
+    test('stores events when enabled', () {
+      final bus = EventBus();
+      bus.enableHistory<String>(maxSize: 10);
+      bus.fire('a');
+      bus.fire('b');
+      expect(bus.history<String>(), equals(['a', 'b']));
+      bus.dispose();
+    });
+
+    test('evicts oldest when capacity exceeded', () {
+      final bus = EventBus();
+      bus.enableHistory<String>(maxSize: 2);
+      bus.fire('a');
+      bus.fire('b');
+      bus.fire('c');
+      expect(bus.history<String>(), equals(['b', 'c']));
+      bus.dispose();
+    });
+
+    test('returns empty list when history not enabled', () {
+      final bus = EventBus();
+      bus.fire('a');
+      expect(bus.history<String>(), isEmpty);
+      bus.dispose();
+    });
+
+    test('onWithHistory emits history then live events', () async {
+      final bus = EventBus();
+      bus.enableHistory<String>(maxSize: 10);
+      bus.fire('old');
+
+      final events = <String>[];
+      final sub = bus.onWithHistory<String>().listen(events.add);
+
+      // Allow async to settle
+      await Future<void>.delayed(Duration.zero);
+      bus.fire('new');
+      await Future<void>.delayed(Duration.zero);
+
+      expect(events, equals(['old', 'new']));
+      await sub.cancel();
+      bus.dispose();
+    });
+  });
+
+  group('hasListeners', () {
+    test('false when no subscriptions', () {
+      final bus = EventBus();
+      expect(bus.hasListeners, isFalse);
+      bus.dispose();
+    });
+
+    test('true after subscribing', () {
+      final bus = EventBus();
+      final sub = bus.on<String>().listen((_) {});
+      expect(bus.hasListeners, isTrue);
+      sub.cancel();
+      bus.dispose();
+    });
+  });
+
+  group('listenerCount', () {
+    test('starts at 0', () {
+      final bus = EventBus();
+      expect(bus.listenerCount, equals(0));
+      bus.dispose();
+    });
+
+    test('increments on subscribe', () {
+      final bus = EventBus();
+      final sub1 = bus.on<String>().listen((_) {});
+      expect(bus.listenerCount, equals(1));
+      final sub2 = bus.on<String>().listen((_) {});
+      expect(bus.listenerCount, equals(2));
+      sub1.cancel();
+      sub2.cancel();
+      bus.dispose();
+    });
+
+    test('decrements on cancel', () {
+      final bus = EventBus();
+      final sub = bus.on<String>().listen((_) {});
+      expect(bus.listenerCount, equals(1));
+      sub.cancel();
+      expect(bus.listenerCount, equals(0));
+      bus.dispose();
+    });
+  });
 }
