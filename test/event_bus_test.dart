@@ -126,6 +126,46 @@ void main() {
     });
   });
 
+  group('onAny', () {
+    test('receives events of all types', () async {
+      final bus = EventBus();
+      final events = <dynamic>[];
+      bus.onAny().listen(events.add);
+
+      bus.fire('hello');
+      bus.fire(42);
+      bus.fire(true);
+      await Future<void>.delayed(Duration(milliseconds: 50));
+
+      expect(events, equals(['hello', 42, true]));
+      bus.dispose();
+    });
+
+    test('receives typed class events', () async {
+      final bus = EventBus();
+      final events = <dynamic>[];
+      bus.onAny().listen(events.add);
+
+      bus.fire('a');
+      bus.fire(1);
+      await Future<void>.delayed(Duration(milliseconds: 50));
+
+      expect(events.length, equals(2));
+      expect(events[0], isA<String>());
+      expect(events[1], isA<int>());
+      bus.dispose();
+    });
+
+    test('tracks listener count', () {
+      final bus = EventBus();
+      final sub = bus.onAny().listen((_) {});
+      expect(bus.listenerCount, equals(1));
+      sub.cancel();
+      expect(bus.listenerCount, equals(0));
+      bus.dispose();
+    });
+  });
+
   group('hasListeners', () {
     test('false when no subscriptions', () {
       final bus = EventBus();

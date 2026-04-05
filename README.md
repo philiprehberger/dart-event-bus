@@ -16,7 +16,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  philiprehberger_event_bus: ^0.2.0
+  philiprehberger_event_bus: ^0.3.0
 ```
 
 Then run:
@@ -105,6 +105,21 @@ bus.onWithHistory<String>().listen((event) {
 });
 ```
 
+### Wildcard Listener
+
+Listen to all events regardless of type — useful for logging and debugging:
+
+```dart
+bus.onAny().listen((event) {
+  print('Event fired: $event');
+});
+
+bus.fire('hello');
+bus.fire(42);
+// Prints: Event fired: hello
+// Prints: Event fired: 42
+```
+
 ### Listener Introspection
 
 Check whether the bus has active listeners:
@@ -134,6 +149,7 @@ After calling `dispose()`, no more events can be fired or received.
 |--------|-------------|
 | `fire<T>(T event)` | Dispatch an event to all listeners of type `T` |
 | `on<T>()` | Subscribe to events of type `T`, returns `Stream<T>` |
+| `onAny()` | Subscribe to all events regardless of type, returns `Stream<dynamic>` |
 | `once<T>()` | Returns a `Future<T>` that completes with the next event, then auto-cancels |
 | `fireSticky<T>(T event)` | Dispatch a sticky event that replays to new subscribers |
 | `lastSticky<T>()` | Get the last sticky event of type `T`, or `null` |
