@@ -16,7 +16,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  philiprehberger_event_bus: ^0.3.0
+  philiprehberger_event_bus: ^0.4.0
 ```
 
 Then run:
@@ -28,7 +28,7 @@ dart pub get
 ## Usage
 
 ```dart
-import 'package:philiprehberger_event_bus/event_bus.dart';
+import 'package:philiprehberger_event_bus/philiprehberger_event_bus.dart';
 
 final bus = EventBus();
 ```
@@ -103,6 +103,12 @@ print(bus.history<String>()); // ['first', 'second']
 bus.onWithHistory<String>().listen((event) {
   print(event); // 'first', 'second', then any new events
 });
+
+// Clear stored events but keep collecting
+bus.clearHistory<String>();
+
+// Stop collecting history entirely
+bus.disableHistory<String>();
 ```
 
 ### Wildcard Listener
@@ -157,6 +163,8 @@ After calling `dispose()`, no more events can be fired or received.
 | `enableHistory<T>({int maxSize})` | Enable event history for type `T` with a max capacity |
 | `history<T>()` | Get stored events of type `T` as an unmodifiable list |
 | `onWithHistory<T>()` | Stream that emits stored history first, then live events |
+| `clearHistory<T>()` | Clear stored events of type `T` without disabling collection |
+| `disableHistory<T>()` | Stop collecting history for type `T` and discard stored events |
 | `hasListeners` | Whether any listeners are currently active |
 | `listenerCount` | Number of active stream subscriptions |
 | `dispose()` | Close the bus and release all resources |
@@ -173,13 +181,19 @@ dart test
 
 If you find this project useful:
 
-- [Star the repo](https://github.com/philiprehberger/dart-event-bus)
-- [Report issues](https://github.com/philiprehberger/dart-event-bus/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
-- [Suggest features](https://github.com/philiprehberger/dart-event-bus/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement)
-- [Sponsor development](https://github.com/sponsors/philiprehberger)
-- [All Open Source Projects](https://philiprehberger.com/open-source-packages)
-- [GitHub Profile](https://github.com/philiprehberger)
-- [LinkedIn Profile](https://www.linkedin.com/in/philiprehberger)
+⭐ [Star the repo](https://github.com/philiprehberger/dart-event-bus)
+
+🐛 [Report issues](https://github.com/philiprehberger/dart-event-bus/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
+
+💡 [Suggest features](https://github.com/philiprehberger/dart-event-bus/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement)
+
+❤️ [Sponsor development](https://github.com/sponsors/philiprehberger)
+
+🌐 [All Open Source Projects](https://philiprehberger.com/open-source-packages)
+
+💻 [GitHub Profile](https://github.com/philiprehberger)
+
+🔗 [LinkedIn Profile](https://www.linkedin.com/in/philiprehberger)
 
 ## License
 

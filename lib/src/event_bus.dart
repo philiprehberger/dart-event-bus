@@ -78,6 +78,22 @@ class EventBus {
     _history[T] ??= [];
   }
 
+  /// Clear all stored events for type [T] without disabling future collection.
+  ///
+  /// If history is not enabled for [T], this is a no-op.
+  void clearHistory<T>() {
+    _history[T]?.clear();
+  }
+
+  /// Stop collecting history for type [T] and discard stored events.
+  ///
+  /// After calling this, new events of type [T] will no longer be stored.
+  /// Call [enableHistory] to start collecting again.
+  void disableHistory<T>() {
+    _history.remove(T);
+    _historyMaxSize.remove(T);
+  }
+
   /// Returns stored events of type [T], or an empty list if history
   /// is not enabled for [T].
   List<T> history<T>() {
